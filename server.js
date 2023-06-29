@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
+const mySecret = process.env['OA_API_KEY']
 import cors from 'cors'
 
 import ask from './utils/openai.js'
@@ -8,7 +9,7 @@ const main = async ({ port }) => {
   const app = express()
 
   app.use(express.json())
-  app.use(express.urlencoded({ extended: true}))
+  app.use(express.urlencoded({ extended: true }))
   app.use(cors())
 
   app.get('/', (_req, res) => res.send('Welcome to GPT ask!'))
@@ -24,13 +25,13 @@ const main = async ({ port }) => {
       response = 'CON Please enter the diease of your patient. E.g. Malaria'
     } else if (text === '0') {
       response = 'END You have exited the GPT ASK. Thank you for using our service. Goodbye!'
-    } else if (text.split('*').length > 1) {
+    } else if (text.split(' ').length > 1) {
       console.log({ text })
-      const disease = text.split('*')
-      const input = disease[symptoms.length - 1].split('#')[0]
+      const disease = text.split(' ')
+      const input = disease[disease.length - 1].split('#')[0]
 
       const outcome = await ask(input)
-      
+
       if (outcome.status === 'success') {
         response = `END ${outcome.message}`
       } else {
